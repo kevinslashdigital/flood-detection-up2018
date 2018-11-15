@@ -1,0 +1,46 @@
+{
+  "name": "kyc-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack-dev-server --env dev --progress --profile --colors --mode=development --host=0.0.0.0",
+    "build": "webpack --env prod --progress --profile --colors --optimize-minimize",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://slash-sophatvathana@bitbucket.org/ventureslash/kyc-api.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/ventureslash/kyc-api#readme",
+  "devDependencies": {
+    "bourbon": "^5.1.0",
+    "css-loader": "^1.0.0",
+    "extract-loader": "^3.0.0",
+    "extract-text-webpack-plugin": "^4.0.0-beta.0",
+    "file-loader": "^2.0.0",
+    "html-webpack-plugin": "^4.0.0-alpha.2",
+    "node-sass": "^4.9.3",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.0",
+    "webpack-cli": "^3.1.0"
+  },
+  "dependencies": {
+    "copy-webpack-plugin": "^4.5.3",
+    "country-select-js": "^2.0.1",
+    "cropper": "^4.0.0",
+    "express": "^4.16.4",
+    "express-http-proxy": "^1.4.0",
+    "express-static-proxy": "^1.0.0",
+    "html-loader": "^0.5.5",
+    "jquery": "^3.3.1",
+    "jquery-confirm": "^3.3.2",
+    "jquery-validation": "^1.18.0",
+    "recordrtc": "^5.4.8",
+    "smooth-scroll": "^14.2.1",
+    "webpack": "^4.19.1"
+  }
+}
