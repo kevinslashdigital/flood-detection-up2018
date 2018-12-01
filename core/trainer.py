@@ -80,8 +80,8 @@ def train_model():
   df = pd.read_csv("dataset/flood_data.csv", sep = ",",usecols=['created_at','sensor_location','streamHeight'])
   # df['updated_at'] = pd.to_datetime(df['updated_at'],infer_datetime_format=True)
 
-  df['created_at'] = pd.to_datetime(df['created_at'],utc=False)
-  df.sort_values(by='created_at',ascending=True,inplace=True,na_position='first') # This
+  df['created_at'] = pd.to_datetime(df['created_at'],utc=False) #sort data by create_at
+  df.sort_values(by='created_at',ascending=True,inplace=True,na_position='first') # This #use create_at as index
   # df = df.cumsum()
   print(df.head(20))
 
@@ -99,16 +99,16 @@ def train_model():
   # print(trainX,trainX.shape[0])
   # print('=============')
   # print(trainY,trainY.shape[0])
-  previous_steps = 2
-  forecast_steps = 2
+  previous_steps = 2 #input 2 months before for predict
+  forecast_steps = 2 #predict 2 months forward
 
-  dataset = transform_to_supervised(df_sr,previous_steps=previous_steps, forecast_steps=forecast_steps,dropnan=True)
+  dataset = transform_to_supervised(df_sr,previous_steps=previous_steps, forecast_steps=forecast_steps,dropnan=True) #transform data to surpervised
   dataset = dataset.values.astype('float32')
   # Using 60% of data for training, 40% for validation.
   TRAIN_SIZE = 0.60
   train_size = int(len(dataset) * TRAIN_SIZE)
   test_size = len(dataset) - train_size
-  train, test = dataset[0:train_size, :], dataset[train_size:len(dataset), :]
+  train, test = dataset[0:train_size, :], dataset[train_size:len(dataset), :] #split data for train and test , first is row and second is column
   print("Number of entries (training set, test set): " + str((len(train), len(test))))
   print(train)
 
@@ -122,7 +122,7 @@ def train_model():
   print(trainX,trainY,trainX.shape)
   print('=============')
   # reshape input to be [samples, time steps, features]
-  trainX = np.reshape(trainX, (trainX.shape[0], 1, trainX.shape[1]))
+  trainX = np.reshape(trainX, (trainX.shape[0], 1, trainX.shape[1])) #shape(row,column)
   testX = np.reshape(testX, (testX.shape[0], 1, testX.shape[1]))
 
   batch_size = 112 # 14 56 112
@@ -130,7 +130,7 @@ def train_model():
   model = RNN_LSTM().create_model(batch_size,input_shape=(1,forecast_steps),nClasses=forecast_steps)
   model.summary()
   model.compile(loss='mean_squared_error', optimizer='adam')
-  model.fit(trainX, trainY, epochs=100, batch_size=batch_size, verbose=1)
+  model.fit(trainX, trainY, epochs=100, batch_size=batch_size, verbose=1) #epochs run 100 times, batch_size is size of data for run
 
 
   # predict and score
@@ -138,7 +138,7 @@ def train_model():
   test_predict = model.predict(testX)
   print('prediction',train_predict,testY)
   # Calculate RMSE.
-  score = math.sqrt(mean_squared_error(testY, test_predict))
+  score = math.sqrt(mean_squared_error(testY, test_predict)) #Find error
   # print("Training data score: %.2f RMSE" % rmse_train)
   print("Test data score: %.2f RMSE" % score)
 

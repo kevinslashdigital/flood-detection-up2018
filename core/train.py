@@ -22,22 +22,25 @@ def train_model():
     # fix random seed for reproducibility
     numpy.random.seed(7)
     # load the dataset
-    dataframe = read_csv('dataset/international-airline-passengers.csv', usecols=[1], engine='python', skipfooter=3)
-    dataset = dataframe.values
+    dataframe = read_csv('dataset/shampoo.csv', usecols=[1], engine='python', skipfooter=0)
+    print(dataframe)
+    dataset = dataframe.values #convert to array numpy
     dataset = dataset.astype('float32')
-    print(len(dataset))
+    print(len(dataset),dataset)
+
     # normalize the dataset
     scaler = MinMaxScaler(feature_range=(0, 1))
     dataset = scaler.fit_transform(dataset)
     # split into train and test sets
     train_size = int(len(dataset) * 0.67)
     test_size = len(dataset) - train_size
-    train, test = dataset[0:train_size,:], dataset[train_size:len(dataset),:]
+    train, test = dataset[0:train_size,:], dataset[train_size:len(dataset),:] #separate data for train and test
     # reshape into X=t and Y=t+1
-    look_back = 3
+    look_back = 3 #predict 3 months forward
     trainX, trainY = create_dataset(train, look_back)
     testX, testY = create_dataset(test, look_back)
     print(len(trainY),len(testY))
+    print(trainX,trainY)
     # reshape input to be [samples, time steps, features]
     trainX = numpy.reshape(trainX, (trainX.shape[0], 1, trainX.shape[1]))
     testX = numpy.reshape(testX, (testX.shape[0], 1, testX.shape[1]))
