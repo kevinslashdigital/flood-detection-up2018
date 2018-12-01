@@ -7,10 +7,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
   <title>Combat ID Fraud | Clik</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-    crossorigin="anonymous">
-  <link href="https://fonts.googleapis.com/css?family=Nunito+Sans|Saira+Semi+Condensed:600" rel="stylesheet">
-
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
     crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
@@ -35,46 +32,53 @@
 </head>
 
 <body>
-  <main role="main" style="width:100%;height:800px;">
-    <div class="chart-container" style="position: relative; height:40vh; width:80vw">
-        <canvas id="myChart"></canvas>
-    </div>
-    <!-- Marketing messaging and featurettes
-      ================================================== -->
-    <!-- Wrap the rest of the page in another container to center all the content. -->
-
-    <!-- START THE FEATURETTES -->
-
-    <!-- FOOTER -->
-    <!-- <footer class="container-fluid">
-      <div class="container">
-        <div>
-          <img id="logo_footer" src="images/header_bg.png" alt="Clik Logo" />
-        </div>
-      
-        <p>footer</p>
+  <div class="container">
+    <div class="full-width">
+      <div class="main-container">
+        <header>
+          <div class="header-container">
+            <div class="logo-container">
+              <img src='./images/logo.jpg' />
+            </div>
+            <div class="title-container">
+              <h1>Cambodia Flood Detection</h1>
+            </div>
+          </div>
+        </header>
+        <main role="main" style="width:100%;height:100%;">
+          <div class="chart-container" style="position: relative; height:40vh; width:100%">
+              <canvas id="myChart"></canvas>
+          </div>
+        </main>
       </div>
-    </footer> -->
-  </main>
+      <footer>
+        <div class="footer-container">
+          <h1>By Group 2</h1>
+          <h2>Copy right</h2>
+        </div>
+      </footer>
+    </div>
+      </div>
+  </div>
 
 </body>
 <script>
+  var labels = [];
+  var data = []
+  for(var i=0; i < 60; i++) {
+    labels.push(("01/0" +i).toString());
+    data.push(i+10);
+  }
+  console.log('labels', labels, data);
   var ctx = document.getElementById("myChart");
   var myChart = new Chart(ctx, {
-    type: 'bar',
+    type: 'line',
     data: {
-        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+        labels: labels,
         datasets: [{
             label: '# of Votes',
-            data: [12, 19, 3, 5, 2, 3],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
-            ],
+            data: data,
+            backgroundColor: 'transparent',
             borderColor: [
                 'rgba(255,99,132,1)',
                 'rgba(54, 162, 235, 1)',
