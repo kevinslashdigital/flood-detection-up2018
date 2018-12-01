@@ -24,9 +24,9 @@ def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
     # forecast sequence (t, t+1, ... t+n)
     for i in range(0, n_out):
         cols.append(df.shift(-i))
-        # print('===============')
-        # print('name2',names)
-        # print('cols',cols)
+        print('===============')
+        print('name2',names)
+        print('cols',cols)
         if i == 0:
             names += [('var%d(t)' % (j+1)) for j in range(n_vars)]
         else:
@@ -97,7 +97,7 @@ def train_model():
     series = read_csv('dataset/shampoo.csv', header=0, parse_dates=[0], index_col=0, squeeze=True, date_parser=parser)
     # configure
     n_lag = 1
-    n_seq = 2
+    n_seq = 3
     n_test = 10
     print(series)
     # prepare data
@@ -107,9 +107,9 @@ def train_model():
     # make forecasts
     forecasts = make_forecasts(train, test, n_lag, n_seq)
     # evaluate forecasts
-    evaluate_forecasts(test, forecasts, n_lag, n_seq)
+    # evaluate_forecasts(test, forecasts, n_lag, n_seq)
     # plot forecasts
-    plot_forecasts(series, forecasts, n_test+2)
+    # plot_forecasts(series, forecasts, n_test+2)
 
     
 if __name__ == "__main__":
