@@ -6,8 +6,9 @@ import random
 from flask import request
 from flask import jsonify
 from flask import Flask
+from flask_cors import CORS
 app = Flask(__name__)
-
+CORS(app)
 # cd ai
 # FLASK_APP=hello.py flask run
 
