@@ -36,7 +36,7 @@
 </head>
 
 <body>
-  <div class="container">
+  <div class="index-container">
     <div class="full-width">
       <div class="main-container">
         <header>
@@ -44,48 +44,62 @@
             <div class="logo-container">
               <img src='./images/logo.jpg' />
             </div>
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+              <!-- <a class="navbar-brand" href="#">Navbar</a> -->
+              <!-- <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button> -->
+              <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                  <a class="nav-item nav-link active" href="/">HOME<span class="sr-only">(current)</span></a>
+                  <a class="nav-item nav-link" href="/whoweare.html">WHO WE ARE</a>
+                  <a class="nav-item nav-link" href="/contactUs.html">CONTACT US</a>
+                </div>
+              </div>
+            </nav>
             <div class="title-container">
               <h1>Cambodia Flood Detection</h1>
             </div>
           </div>
         </header>
         <main role="main" style="width:100%;height:100%;" class="chart-body-container">
-          <div class="row">
-            <div class="col-lg-6">
-              <div class="chart-container" style="position: relative; width:100%">
-                <canvas id="myChart1"></canvas>
+          <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                  <div class="chart-container" style="position: relative; width:100%">
+                    <canvas id="myChart1"></canvas>
+                  </div>
+                  <h2>Phnom Penh</h2>
+                </div>
+                <div class="col-lg-6">
+                  <div class="chart-container" style="position: relative; width:100%">
+                    <canvas id="myChart2"></canvas>
+                  </div>
+                  <h2>Kampot</h2>
+                </div>
+                <div class="col-lg-6">
+                  <div class="chart-container" style="position: relative; width:100%">
+                    <canvas id="myChart3"></canvas>
+                  </div>
+                  <h2>Kratie</h2>
+                </div>
+                <div class="col-lg-6">
+                  <div class="chart-container" style="position: relative; width:100%">
+                    <canvas id="myChart4"></canvas>
+                  </div>
+                  <h2>Battambang</h2>
+                </div>
               </div>
-              <h2>Phnom Penh</h2>
-            </div>
-            <div class="col-lg-6">
-              <div class="chart-container" style="position: relative; width:100%">
-                <canvas id="myChart2"></canvas>
-              </div>
-              <h2>Kampot</h2>
-            </div>
-            <div class="col-lg-6">
-              <div class="chart-container" style="position: relative; width:100%">
-                <canvas id="myChart3"></canvas>
-              </div>
-              <h2>Kratie</h2>
-            </div>
-            <div class="col-lg-6">
-              <div class="chart-container" style="position: relative; width:100%">
-                <canvas id="myChart4"></canvas>
-              </div>
-              <h2>Battambang</h2>
-            </div>
           </div>
         </main>
       </div>
       <footer>
-        <div class="footer-container">
-          <h1>By Group 2</h1>
-          <h2>Copy right</h2>
+        <div class="footer-container bg-color">
+          <h1>Prepare By: Group 2</h1>
         </div>
       </footer>
     </div>
-      </div>
+  </div>
   </div>
 
 </body>
