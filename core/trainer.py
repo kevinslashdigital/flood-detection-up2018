@@ -100,11 +100,6 @@ def train_model():
   # print('=============')
   # print(trainY,trainY.shape[0])
   previous_steps = 2
-  forecast_steps = 1
-
-  dataset = transform_to_supervised(df_sr,previous_steps=previous_steps, forecast_steps=forecast_steps,dropnan=True)
-  dataset = dataset.values.astype('float32')
-  # Using 60% of data for training, 40% for validation.
   TRAIN_SIZE = 0.60
   train_size = int(len(dataset) * TRAIN_SIZE)
   test_size = len(dataset) - train_size
