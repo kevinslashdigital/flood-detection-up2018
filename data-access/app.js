@@ -4,7 +4,7 @@ var fs = require("fs");
 var rp = require('request-promise');
 var createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const csvWriter = createCsvWriter({
-    path: './data/dataset.csv',
+    path: './data-set/dataset.csv',
     header: [
         {id: 'created_at', title: 'created_at'},
         {id: 'sensor_location', title: 'senor_location'},
