@@ -144,7 +144,7 @@ dataset = read_csv('dataset/household_power_consumption_days.csv', header=0, inf
 # split into train and test
 train, test = split_dataset(dataset.values)
 # evaluate model and get scores
-n_input = 7
+n_input = 17
 score, scores = evaluate_model(train, test, n_input)
 # summarize scores
 summarize_scores('lstm', score, scores)
