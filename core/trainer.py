@@ -1,255 +1,260 @@
-# https://machinelearningmastery.com/multi-step-time-series-forecasting-long-short-term-memory-networks-python/
-import pandas as pd
-from pandas import DataFrame
-from pandas import concat
+from math import sqrt
+from numpy import split
+from numpy import array
 import numpy as np
+import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.externals import joblib
+# from pandas import read_csv
 from sklearn.metrics import mean_squared_error
-import matplotlib.pyplot as plt
+from matplotlib import pyplot
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers import Flatten
+from keras.layers import LSTM
+import os
 import math
-from models.rnn import RNN_LSTM
 
-# convert an array of values into a dataset matrix
-def create_dataset(dataset, look_back=1):
-  dataset = dataset['streamHeight'].values
-  print(dataset)
-  dataX, dataY = [], []
-  for i in range(len(dataset)-look_back-1):
-    a = dataset[i:(i+look_back)]
-    dataX.append(a)
-    dataY.append(dataset[i + look_back])
-  return np.array(dataX), np.array(dataY)
+verbose, epochs, batch_size = 1, 5, 16
+time_step = 30
+is_normalized = True
 
-def transform_to_supervised(df,previous_steps=1, forecast_steps=1,dropnan=True):
-  """
-  Transforms a DataFrame containing time series data into a DataFrame
-  containing data suitable for use as a supervised learning problem.
+def save_scaler(scaler,name='test'):
+    target_dir = './output/' + name
+    scaler_filename = target_dir + "_scaler.save"
+    joblib.dump(scaler, scaler_filename) 
 
-  Derived from code originally found at 
-  https://machinelearningmastery.com/convert-time-series-supervised-learning-problem-python/
+def load_scaler(name='test'):
+    target_dir = './output/' + name
+    scaler = joblib.load(target_dir+"_scaler.save")
+    return scaler 
 
-  :param df: pandas DataFrame object containing columns of time series values
-  :param previous_steps: the number of previous steps that will be included in the
-                          output DataFrame corresponding to each input column
-  :param forecast_steps: the number of forecast steps that will be included in the
-                          output DataFrame corresponding to each input column
-  :return Pandas DataFrame containing original columns, renamed <orig_name>(t), as well as
-          columns for previous steps, <orig_name>(t-1) ... <orig_name>(t-n) and columns 
-          for forecast steps, <orig_name>(t+1) ... <orig_name>(t+n)
-  """
-  # df = df.iloc[:,2]
-  df = df.loc[:, 'streamHeight']
-  print(df.head())
-  # original column names
-  # col_names = df.columns
-  col_names = ['streamHeight']
+# split a univariate dataset into train/test sets
+def split_dataset(data,name='test'):
+    print('split_dataset',data.shape)
+    # find number of record can be train
+    m = data.shape[0] / time_step
+    m = math.floor(m)
+    pos_n = m * time_step
+    data = data[-pos_n:] #data[-330:]
+    data = data.reshape(pos_n,1)
+    print('split_dataset',data.shape)
+    # normallization
+    if is_normalized:
+        scaler = MinMaxScaler(feature_range=(0, 1))
+        data = scaler.fit_transform(data)
+        save_scaler(scaler,name)
+    # split into standard weeks
+    # train, test = data[1:-328,0:1], data[-328:-6,0:1]
+    train, test = data[0:-60,0:1], data[-60:,0:1]
+    print('split_dataset train',train.shape)
+    print('split_dataset test',test.shape)
 
-  # list of columns and corresponding names we'll build from 
-  # the originals found in the input DataFrame
-  cols, names = list(), list()
+    # print(train,test)
+    # restructure into windows of weekly data
+    train = array(split(train, len(train)/30))
+    test = array(split(test, len(test)/30))
+    # print(train,test)
 
-  # input sequence (t-n, ... t-1)
-  for i in range(previous_steps, 0, -1):
-    cols.append(df.shift(i))
-    names += [('%s(t-%d)' % (col_name, i)) for col_name in col_names]
+    # validate train data
+    print(train.shape)
+    print(train[0, 0, 0], train[-1,:, 0])
+    # validate test
+    print(test.shape)
+    print(test[0, 0, 0], test[-1, :, 0])
+    return train, test
+ 
+# evaluate one or more weekly forecasts against expected values
+def evaluate_forecasts(actual, predicted):
+    scores = list()
+    predicted = array(predicted)
+    print('evaluate_forecasts',predicted.shape)
+    predicted = predicted.reshape(predicted.shape[0],predicted.shape[2])
+    print(actual.shape,predicted.shape)
+    # calculate an RMSE score for each day
+    for i in range(actual.shape[1]):
+        # calculate mse
+        mse = mean_squared_error(actual[:, i], predicted[:, i])
+        # calculate rmse
+        rmse = sqrt(mse)
+        # store
+        scores.append(rmse)
+    # calculate overall RMSE
+    s = 0
+    for row in range(actual.shape[0]):
+        for col in range(actual.shape[1]):
+            s += (actual[row, col] - predicted[row, col])**2
+    score = sqrt(s / (actual.shape[0] * actual.shape[1]))
+    return score, scores
+ 
+# summarize scores
+def summarize_scores(name, score, scores):
+    s_scores = ', '.join(['%.1f' % s for s in scores])
+    print('%s: [%.3f] %s' % (name, score, s_scores))
+ 
+# convert history into inputs and outputs
+def to_supervised(train, n_input, n_out=30):
+    # flatten data
+    print('to_supervised',train.shape)
+    data = train.reshape((train.shape[0]*train.shape[1], train.shape[2]))
+    X, y = list(), list()
+    in_start = 0
+    print('len(data)',len(data))
+    # step over the entire history one time step at a time
+    for _ in range(len(data)):
+        # define the end of the input sequence
+        in_end = in_start + n_input
+        out_end = in_end + n_out
+        # ensure we have enough data for this instance
+        if out_end <= len(data):
+            # print('in_start {} in_end {} out_end {}'.format(in_start,in_end,out_end))
+            x_input = data[in_start:in_end, 0]
+            # print(x_input.shape,x_input)
+            x_input = x_input.reshape((len(x_input), 1))
+            # print(x_input.shape,x_input)
+            X.append(x_input)
+            y.append(data[in_end:out_end, 0])
+            # print('y ',data[in_end:out_end, 0])
+        # move along one time step
+        in_start += 1
+    return array(X), array(y)
+ 
+# train the model
+def build_model(train_x, train_y, n_input):
+    # define parameters
+    n_timesteps, n_features, n_outputs = train_x.shape[1], train_x.shape[2], train_y.shape[1]
+    # define model
+    model = Sequential()
+    model.add(LSTM(200, activation='relu', input_shape=(n_timesteps, n_features)))
+    model.add(Dense(100, activation='relu'))
+    model.add(Dense(n_outputs))
+    model.compile(loss='mse', optimizer='adam')
+    # fit network
+    model.fit(train_x, train_y, epochs=epochs, batch_size=batch_size, verbose=verbose)
+    return model
+ 
+# make a forecast
+def forecast(model,input_x,n_input):
+    # reshape into [1, n_input, 1]
+    input_x = input_x.reshape((1, len(input_x), 1))
+    # forecast the next week
+    yhat = model.predict(input_x, verbose=0)
+    # return yhat
 
-  # forecast sequence (t, t+1, ... t+n)
-  for i in range(0, forecast_steps):
-    cols.append(df.shift(-i))
-    if i == 0:
-      names += [('%s(t)' % col_name) for col_name in col_names]
-    else:
-      names += [('%s(t+%d)' % (col_name, i)) for col_name in col_names]
-
-  # put all the columns together into a single aggregated DataFrame
-  agg = pd.concat(cols, axis=1)
-  agg.columns = names
-
-  # drop rows with NaN values
-  if dropnan:
-    agg.dropna(inplace=True)
-  return agg
-
-def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
-  """
-  Frame a time series as a supervised learning dataset.
-  Arguments:
-    data: Sequence of observations as a list or NumPy array.
-    n_in: Number of lag observations as input (X).
-    n_out: Number of observations as output (y).
-    dropnan: Boolean whether or not to drop rows with NaN values.
-  Returns:
-    Pandas DataFrame of series framed for supervised learning.
-  """
-  n_vars = 1 # if type(data) is list else data.shape[1]
-  df = DataFrame(data)
-  cols, names = list(), list()
-  # input sequence (t-n, ... t-1)
-  for i in range(n_in, 0, -1):
-    cols.append(df.shift(i))
-    names += [('var%d(t-%d)' % (j+1, i)) for j in range(n_vars)]
-  # forecast sequence (t, t+1, ... t+n)
-  for i in range(0, n_out):
-    cols.append(df.shift(-i))
-    if i == 0:
-      names += [('var%d(t)' % (j+1)) for j in range(n_vars)]
-    else:
-      names += [('var%d(t+%d)' % (j+1, i)) for j in range(n_vars)]
-  # put it all together
-  agg = concat(cols, axis=1)
-  agg.columns = names
-  # drop rows with NaN values
-  if dropnan:
-    agg.dropna(inplace=True)
-  return agg
-
-def plot(df_sr,df_bbt,df_kc,df_ps):
-  df_sr.plot(y='streamHeight',title='Siemreap').figure.savefig('output/sr.png')
-  df_bbt.plot(y='streamHeight',title='Battambang').figure.savefig('output/btb.png')
-  df_kc.plot(y='streamHeight',title='Kampong Chhnang').figure.savefig('output/kc.png')
-  df_ps.plot(y='streamHeight',title='Pursat').figure.savefig('output/ps.png')
-  plt.show()
+    # print('===== forecast' , n_input)
+    # flatten data
+    data = array(input_x)
+    data = data.reshape((data.shape[0]*data.shape[1], data.shape[2]))
+    # retrieve last observations for input data
+    input_x = data[-n_input:, 0]
+    # reshape into [1, n_input, 1]
+    input_x = input_x.reshape((1, len(input_x), 1))
+    # forecast the next week
+    yhat = model.predict(input_x, verbose=0)
+    # we only want the vector forecast
+    yhat = yhat[0]
+    return input_x,yhat
+ 
+def audit(model,x,y):
+    predictions = list()
+    for i in range(len(x)):
+        input_x = x[i]
+        input_x = input_x.reshape((1, len(input_x), 1))
+        yhat = model.predict(input_x, verbose=0)
+        predictions.append(yhat)
+    return predictions
 
 def preprocessing():
-  df = pd.read_csv("dataset/flood_data.csv", sep = ",",usecols=['created_at','sensor_location','streamHeight'])
-  # replace negative numbers in Pandas Data Frame by zero
-  num = df._get_numeric_data()
-  num[num < 0] = 0
-  print(df.head(20))
-  # df['updated_at'] = pd.to_datetime(df['updated_at'],infer_datetime_format=True)
-  df['created_at'] = pd.to_datetime(df['created_at'],utc=False)
-  df.sort_values(by='created_at',ascending=True,inplace=True,na_position='first') # This
-  # df = df.cumsum()
- 
-  df = df.set_index('created_at')
+    df = pd.read_csv("dataset/flood_data.csv", sep = ",",usecols=['created_at','sensor_location','streamHeight'])
+    # replace negative numbers in Pandas Data Frame by zero
+    num = df._get_numeric_data()
+    num[num < 0] = np.nan
+    print('original from csv',df.head(20))
+    # df['updated_at'] = pd.to_datetime(df['updated_at'],infer_datetime_format=True)
+    df['created_at'] = pd.to_datetime(df['created_at'],utc=False)
+    df.sort_values(by='created_at',ascending=True,inplace=True,na_position='first') # This
+    # df = df.cumsum()
+    
+    df = df.set_index('created_at')
 
 
-  df_sr = df.query('sensor_location == "Siemreap"')
-  df_bbt = df.query('sensor_location == "Battambang"')
-  df_kc = df.query('sensor_location == "Kampong Chhnang"')
-  df_ps = df.query('sensor_location == "Pursat"')
-  print('b4',df_sr.head(20),df_sr.shape,df_sr.isna().sum())   
+    df_sr = df.query('sensor_location == "Siemreap"')
+    df_bbt = df.query('sensor_location == "Battambang"')
+    df_kc = df.query('sensor_location == "Kampong Chhnang"')
+    df_ps = df.query('sensor_location == "Pursat"')
 
-  df_sr = df_sr.resample('D').mean()
-  print(df_sr.head(20),df_sr.shape, df_sr.isna().sum())   
+    # print('tail sr',df_sr.tail(30))
 
-  # plot(df_sr,df_bbt,df_kc,df_ps)
-  return df_sr,df_bbt,df_kc,df_ps
+    # resample to day 'SR'
+    df_sr = df_sr.resample('D').mean()
+    df_sr = df_sr.fillna(method='ffill')
+    # resample to day 'SR'
+    df_bbt = df_bbt.resample('D').mean()
+    df_bbt = df_bbt.fillna(method='ffill')
+    # resample to day 'SR'
+    df_kc = df_kc.resample('D').mean()
+    df_kc = df_kc.fillna(method='ffill')
+    # resample to day 'SR'
+    df_ps = df_ps.resample('D').mean()
+    df_ps = df_ps.fillna(method='ffill')
+    # plot(df_sr,df_bbt,df_kc,df_ps)
+    return df_sr,df_bbt,df_kc,df_ps
 
-# Model support
-def train_model(dataset,previous_steps,forecast_steps):
-  # look_back = 2
-  # trainX, trainY = create_dataset(df_sr, look_back)
+def save_model(model,name):
+    target_dir = './output/' 
+    if not os.path.exists(target_dir):
+        os.mkdir(target_dir)
+    print("[INFO] serializing network to ", target_dir)
+    model.save(target_dir + name + '.model')
+    model.save_weights(target_dir + name +'.weights')
 
-  # print(trainX,trainX.shape[0])
-  # print('=============')
-  # print(trainY,trainY.shape[0])
-  # previous_steps = 2
-  # forecast_steps = 2
-
-  # dataset = transform_to_supervised(df_sr,previous_steps=previous_steps, forecast_steps=forecast_steps,dropnan=True)
-  dataset = dataset.values.astype('float32')
-  # Using 60% of data for training, 40% for validation.
-  TRAIN_SIZE = 0.60
-  train_size = int(len(dataset) * TRAIN_SIZE)
-  test_size = len(dataset) - train_size
-  train, test = dataset[0:train_size, :], dataset[train_size:len(dataset), :]
-  print("Number of entries (training set, test set): " + str((len(train), len(test))))
-
-  print('before =============',train.shape)
-
-
-  # trainX, trainY = dataset
-  trainX = train[:,0:previous_steps]
-  trainY = train[:,previous_steps:previous_steps+forecast_steps]
-
-  testX = test[:,0:previous_steps]
-  testY = test[:,previous_steps:previous_steps+forecast_steps]
-
-  print('=============',previous_steps+forecast_steps)
-  print(trainY.shape, trainX.shape)
-  print('=============')
-  # n_timesteps = forecast_steps
-  # n_features = trainX.shape[1]
-
-  n_timesteps = 1
-  n_features = trainX.shape[1]
-  # reshape input to be [samples, time steps, features]
-  trainX = np.reshape(trainX, (trainX.shape[0],previous_steps , trainX.shape[1]))
-  testX = np.reshape(testX, (testX.shape[0], previous_steps, testX.shape[1]))
-
-  batch_size = 155 # 14 56 112
-  print('***',type(trainX),testY.shape)
- 
-  model = RNN_LSTM().create_model(batch_size,input_shape=(n_timesteps, n_features),nClasses=testY.shape[1])
-  model.summary()
-  model.compile(loss='mean_squared_error', optimizer='adam')
-  model.fit(trainX, trainY, epochs=50, batch_size=batch_size, verbose=1)
-
-  # predict and score
-  train_predict = model.predict(trainX)
-  test_predict = model.predict(testX)
-  print('prediction',train_predict,testY)
-  # Calculate RMSE.
-  score = math.sqrt(mean_squared_error(testY, test_predict))
-  # print("Training data score: %.2f RMSE" % rmse_train)
-  print("Test data score: %.2f RMSE" % score)
-
-
-  print(train_predict.shape,test_predict.shape)
-
-
-
-
-  # # Start with training predictions.
-  # train_predict_plot = np.empty_like(dataset[:,0:1])
-  # print('dataset',dataset.shape)
-  # print(dataset)
-  # print('train_predict_plot',train_predict_plot.shape,train_predict.shape)
-  # train_predict_plot[:, :] = np.nan
-  # # train_predict_plot[forecast_steps:len(train_predict) + forecast_steps, :] = train_predict
-  # train_predict_plot[0:len(train_predict), :] = train_predict
-  # print(train_predict_plot.shape)
-
-  
-
-  # # Add test predictions.
-  # test_predict_plot = np.empty_like(dataset[:,0:1])
-  # print('test_predict_plot',test_predict_plot.shape)
-  # test_predict_plot[:, :] = np.nan
-  # test_predict_plot[len(train_predict):len(dataset), :] = test_predict
-  
-  print("test_predict",testX.shape)
-  last_step = testX[-1,:,:]
-  last_step = np.reshape(last_step, (last_step.shape[0],previous_steps, last_step.shape[1]))
-  print("last_step",last_step.shape)
-  
-  forecast = model.predict(last_step)
-  print('last step = {} forecast = {}'.format(last_step,forecast))
-
-
-  # Create the plot.
-  # plt.figure(figsize = (15, 5))
-  # plt.plot(dataset, label = "True value")
-  # plt.plot(train_predict_plot, label = "Training set prediction")
-  # plt.plot(test_predict_plot, label = "Test set prediction")
-  # plt.xlabel("Months")
-  # plt.ylabel("1000 International Airline Passengers")
-  # plt.title("Comparison true vs. predicted training / test")
-  # plt.legend()
-  # plt.show()
-
-
-
+def fit_and_save_model(dataset,name):
+    print('fit_and_save_model',dataset.tail(30))
+    n_input = 30
+    n_output = 30
+    # split into train and test
+    train, test = split_dataset(dataset.values,name)
+    # prepare data & convert history into inputs and outputs
+    train_x, train_y = to_supervised(train, n_input,n_output)
+    test_x, test_y = to_supervised(test, n_input,n_output)
+    print('test last', test[-1,:],test.shape)
+    print('==== train head ====')
+    print('train.shape',train.shape,test.shape)
+    print('==== to_supervised ====')
+    print('trainxy.shape',train_x.shape,train_y.shape)
+    print('testxy.shape',test_x.shape,test_y.shape)
+     # train/fit model
+    model = build_model(train_x, train_y, n_input)
+    # test prediction
+    predictions = audit(model, test_x,test_y)
+    print('predictions',predictions)
+    # predictions = array(predictions)
+    score, scores = evaluate_forecasts(test_y, predictions)
+    print('score',score,scores)
+    # forecast to next 30 step
+    last_step = test[-1,:]
+    pred = forecast(model,last_step,n_input)
+    pred = pred[1]
+    if is_normalized:
+        scaler = load_scaler(name)
+        pred = scaler.inverse_transform([pred])
+    print('last step {} forecast to {}'.format(last_step,pred))
+    # save model
+    save_model(model,name)
+    # plot next 30 step forecast
+    # days = ['2010-11-27', '2010-11-28', '2010-11-29', '2010-11-30', '2010-11-31', '2010-12-01', '2010-12-02']
+    # pyplot.plot(days, pred[0], marker='o', label='lstm')
+    # pyplot.show()
 
 if __name__ == "__main__":
-  df_sr,df_bbt,df_kc,df_ps = preprocessing()
-  sr = df_sr.loc[:, 'streamHeight']
-  bbt = df_bbt.loc[:, 'streamHeight']
-  # print('values',sr,sr.shape)
-  # print(sr.tail())
-  data = series_to_supervised(sr,1,30)
-  print(data)
-  train_model(data,30,30)
-  
+    # preprocessing
+    df_sr,df_bbt,df_kc,df_ps = preprocessing()
+    sr = df_sr.loc[:, 'streamHeight']
+    bbt = df_bbt.loc[:, 'streamHeight']
+    kc = df_kc.loc[:, 'streamHeight']
+    ps = df_ps.loc[:, 'streamHeight']
 
+    fit_and_save_model(sr,'sr')
+    # fit_and_save_model(bbt,'bt')
+    # fit_and_save_model(kc,'kc')
+    # fit_and_save_model(ps,'ps')
