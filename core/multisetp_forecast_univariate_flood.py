@@ -11,14 +11,20 @@ from keras.layers import Dense
 from keras.layers import Flatten
 from keras.layers import LSTM
 import os
+import math
 
 verbose, epochs, batch_size = 1, 2, 16
+time_step = 30
 
 # split a univariate dataset into train/test sets
 def split_dataset(data):
     print('split_dataset',data.shape)
-    data = data[-330:]
-    data = data.reshape(330,1)
+    # find number of record can be train
+    m = data.shape[0] / time_step
+    m = math.floor(m)
+    pos_n = m * time_step
+    data = data[-pos_n:] #data[-330:]
+    data = data.reshape(pos_n,1)
     print('split_dataset',data.shape)
     
     # split into standard weeks
@@ -178,12 +184,12 @@ def preprocessing():
     return df_sr,df_bbt,df_kc,df_ps
 
 def save_model(model,name):
-    target_dir = './ouput/'
+    target_dir = './output/' + name
     if not os.path.exists(target_dir):
         os.mkdir(target_dir)
     print("[INFO] serializing network to ", target_dir)
-    model.save('./ouput/' + name + '.model')
-    model.save_weights('./ouput/' + name +'.weights')
+    model.save(target_dir + '.model')
+    model.save_weights(target_dir +'.weights')
 
 def fit_and_save_model(dataset,name):
     print('fit_and_save_model',dataset.tail(30))
@@ -228,6 +234,6 @@ if __name__ == "__main__":
     ps = df_ps.loc[:, 'streamHeight']
 
     # fit_and_save_model(sr,'sr')
-    # fit_and_save_model(bbt,'bt')
+    fit_and_save_model(bbt,'bt')
     # fit_and_save_model(kc,'kc')
-    fit_and_save_model(ps,'ps')
+    # fit_and_save_model(ps,'ps')
