@@ -3,6 +3,8 @@ from numpy import split
 from numpy import array
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.externals import joblib
 # from pandas import read_csv
 from sklearn.metrics import mean_squared_error
 from matplotlib import pyplot
@@ -13,11 +15,22 @@ from keras.layers import LSTM
 import os
 import math
 
-verbose, epochs, batch_size = 1, 2, 16
+verbose, epochs, batch_size = 1, 5, 16
 time_step = 30
+is_normalized = True
+
+def save_scaler(scaler,name='test'):
+    target_dir = './output/' + name
+    scaler_filename = target_dir + "_scaler.save"
+    joblib.dump(scaler, scaler_filename) 
+
+def load_scaler(name='test'):
+    target_dir = './output/' + name
+    scaler = joblib.load(target_dir+"_scaler.save")
+    return scaler 
 
 # split a univariate dataset into train/test sets
-def split_dataset(data):
+def split_dataset(data,name='test'):
     print('split_dataset',data.shape)
     # find number of record can be train
     m = data.shape[0] / time_step
@@ -26,7 +39,11 @@ def split_dataset(data):
     data = data[-pos_n:] #data[-330:]
     data = data.reshape(pos_n,1)
     print('split_dataset',data.shape)
-    
+    # normallization
+    if is_normalized:
+        scaler = MinMaxScaler(feature_range=(0, 1))
+        data = scaler.fit_transform(data)
+        save_scaler(scaler,name)
     # split into standard weeks
     # train, test = data[1:-328,0:1], data[-328:-6,0:1]
     train, test = data[0:-60,0:1], data[-60:,0:1]
@@ -184,19 +201,19 @@ def preprocessing():
     return df_sr,df_bbt,df_kc,df_ps
 
 def save_model(model,name):
-    target_dir = './output/' + name
+    target_dir = './output/' 
     if not os.path.exists(target_dir):
         os.mkdir(target_dir)
     print("[INFO] serializing network to ", target_dir)
-    model.save(target_dir + '.model')
-    model.save_weights(target_dir +'.weights')
+    model.save(target_dir + name + '.model')
+    model.save_weights(target_dir + name +'.weights')
 
 def fit_and_save_model(dataset,name):
     print('fit_and_save_model',dataset.tail(30))
     n_input = 30
     n_output = 30
     # split into train and test
-    train, test = split_dataset(dataset.values)
+    train, test = split_dataset(dataset.values,name)
     # prepare data & convert history into inputs and outputs
     train_x, train_y = to_supervised(train, n_input,n_output)
     test_x, test_y = to_supervised(test, n_input,n_output)
@@ -217,6 +234,10 @@ def fit_and_save_model(dataset,name):
     # forecast to next 30 step
     last_step = test[-1,:]
     pred = forecast(model,last_step,n_input)
+    pred = pred[1]
+    if is_normalized:
+        scaler = load_scaler(name)
+        pred = scaler.inverse_transform([pred])
     print('last step {} forecast to {}'.format(last_step,pred))
     # save model
     save_model(model,name)
@@ -233,7 +254,7 @@ if __name__ == "__main__":
     kc = df_kc.loc[:, 'streamHeight']
     ps = df_ps.loc[:, 'streamHeight']
 
-    # fit_and_save_model(sr,'sr')
-    fit_and_save_model(bbt,'bt')
+    fit_and_save_model(sr,'sr')
+    # fit_and_save_model(bbt,'bt')
     # fit_and_save_model(kc,'kc')
     # fit_and_save_model(ps,'ps')
