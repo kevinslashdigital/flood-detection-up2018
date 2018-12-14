@@ -93,7 +93,17 @@ const dev = {
               from: path.join(basePath, 'src/images'),
               to: path.join(basePath, 'static/images'),
               cache: false
-            }
+            }, 
+            {
+              from: path.join(basePath, 'src/contactUs.html'),
+              to: path.join(basePath, 'static/contactUs.html'),
+              cache: false
+            },
+            {
+                from: path.join(basePath, 'src/whoweare.html'),
+                to: path.join(basePath, 'static/whoweare.html'),
+                cache: false
+              }
         ], {})
     ]
 };
@@ -164,7 +174,7 @@ const production = {
         }),
         new HtmlWebpackPlugin({
             title: 'Fake detector',
-            template: 'index_2.html',
+            template: 'index.html',
             inject:true,
             hash:true,
             "files": {
