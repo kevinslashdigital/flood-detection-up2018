@@ -91,6 +91,9 @@
                 </div>
               </div>
           </div>
+          <div style="text-align:center">
+            <button onclick="prediction()">Prediction</button>
+          </div>
         </main>
       </div>
       <footer>
@@ -351,5 +354,33 @@
   //       }
   //   }
   // });
+  function prediction() {
+    console.log('PREDICTION');
+    async.auto({
+      getData(callback) {
+        fetch('http://127.0.0.1:5000/forecast', {
+            method: 'POST',
+            body: {},
+          })
+          .then(response => {
+            if (response.status === 200) {
+              return response.json();
+            } else {
+              throw new Error('Something went wrong on api server!');
+            }
+          })
+          .then(response => {
+            console.log('RESPONSE', response);
+            console.debug(response);
+            callback(null, response.data);
+            // ...
+          }).catch(error => {
+            console.error(error);
+          });
+      },
+    }, (err, results) => {
+      console.log('RESULTS', results);
+    });
+  }
   </script>
 </html>

@@ -17,7 +17,7 @@ import math
 
 verbose, epochs, batch_size = 1, 5, 16
 time_step = 30
-is_normalized = True
+is_normalized = False
 
 def save_scaler(scaler,name='test'):
     target_dir = './output/' + name
@@ -35,7 +35,7 @@ def split_dataset(data,name='test'):
     # find number of record can be train
     m = data.shape[0] / time_step
     m = math.floor(m)
-    pos_n = m * time_step
+    pos_n = int(m * time_step)
     data = data[-pos_n:] #data[-330:]
     data = data.reshape(pos_n,1)
     print('split_dataset',data.shape)
@@ -164,8 +164,8 @@ def audit(model,x,y):
         predictions.append(yhat)
     return predictions
 
-def preprocessing():
-    df = pd.read_csv("dataset/flood_data.csv", sep = ",",usecols=['created_at','sensor_location','streamHeight'])
+def preprocessing(path="dataset/flood_data.csv"):
+    df = pd.read_csv(path, sep = ",",usecols=['created_at','sensor_location','streamHeight'])
     # replace negative numbers in Pandas Data Frame by zero
     num = df._get_numeric_data()
     num[num < 0] = np.nan
@@ -254,7 +254,10 @@ if __name__ == "__main__":
     kc = df_kc.loc[:, 'streamHeight']
     ps = df_ps.loc[:, 'streamHeight']
 
+    print(sr.tail(30))
+
     fit_and_save_model(sr,'sr')
-    # fit_and_save_model(bbt,'bt')
-    # fit_and_save_model(kc,'kc')
-    # fit_and_save_model(ps,'ps')
+    fit_and_save_model(bbt,'bt')
+    fit_and_save_model(kc,'kc')
+    fit_and_save_model(ps,'ps')
+    

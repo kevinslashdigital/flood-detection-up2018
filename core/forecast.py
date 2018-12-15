@@ -3,7 +3,6 @@ from keras.preprocessing.image import img_to_array
 from keras.models import load_model
 import numpy as np
 import pickle
-import cv2
 from sklearn.externals import joblib
 
 is_normalized = True
@@ -32,8 +31,8 @@ def make_forecast(model,input_x,n_input):
   yhat = yhat[0]
   return input_x,yhat
  
-def forecast(data,name,n_input=30):
-  target_dir = './output/' + name
+def forecast(data,name,n_input=30,path='./output/'):
+  target_dir = path + name
   model = load_model(target_dir + '.model')
   model.load_weights(target_dir + '.weights')
   last_step = data
