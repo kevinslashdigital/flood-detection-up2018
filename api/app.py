@@ -2,6 +2,7 @@ import json
 from datetime import date, timedelta, datetime
 import numpy as np
 import pandas as pd
+import tensorflow as tf
 from flask import Response
 import random
 from ..core.trainer import preprocessing
@@ -12,6 +13,7 @@ from flask import Flask
 from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
+graph = tf.get_default_graph()
 # cd ai
 # FLASK_APP=hello.py flask run
 
@@ -50,10 +52,11 @@ def classify():
   # doc = body['doc']
   # print(body['doc'])
   df_sr,df_bbt,df_kc,df_ps = preprocessing("../core/dataset/flood_data.csv")
-  result_sr = funcPrediction(df_sr,'sr')
-  result_bbt = funcPrediction(df_bbt,'bt')
-  result_kc = funcPrediction(df_kc,'kc')
-  result_ps = funcPrediction(df_ps,'ps')
+  with graph.as_default():
+    result_sr = funcPrediction(df_sr,'sr')
+    result_bbt = funcPrediction(df_bbt,'bt')
+    result_kc = funcPrediction(df_kc,'kc')
+    result_ps = funcPrediction(df_ps,'ps')
   response = {
       "sr": result_sr,
       "bbt": result_bbt,
