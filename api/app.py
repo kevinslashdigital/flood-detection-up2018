@@ -98,12 +98,11 @@ def funcPrediction( data,name ):
       temp1 = value
       list_new_last_30_days.append(temp1)
     # merge last and predictions together
-    concate_date = np.append(list_new_last_30_days, list_new_predictions)
-    concate_data = {**new_last_30_days, **new_predictions}
+    concate_data = np.append(list_new_last_30_days, list_new_predictions)
     response = {
         "last_30_days" : last_30_days.tolist(),
         "prediction" : predictions.tolist(),
-        "concate_data" : concate_date.tolist(),
+        "concate_data" : concate_data.tolist(),
       }
     return response
  
