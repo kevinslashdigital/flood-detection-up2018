@@ -21,7 +21,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/async/2.6.1/async.js" type="text/javascript"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/async/2.6.1/async.min.js" type="text/javascript"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.js" type="text/javascript"></script>
-
+  <script src="https://rawgit.com/moment/moment/2.2.1/min/moment.min.js" type="text/javascript"></script>
 
     <script>
       function copyLink() {
@@ -66,33 +66,30 @@
           <div class="container">
             <div class="row">
                 <div class="col-lg-6">
+                    <h2>Battambang</h2>
                   <div class="chart-container" style="position: relative; width:100%">
                     <canvas id="myChart1"></canvas>
                   </div>
-                  <h2>Phnom Penh</h2>
                 </div>
                 <div class="col-lg-6">
+                  <h2>Kampong Cham</h2>
                   <div class="chart-container" style="position: relative; width:100%">
                     <canvas id="myChart2"></canvas>
                   </div>
-                  <h2>Kampot</h2>
                 </div>
                 <div class="col-lg-6">
+                  <h2>Pursat</h2>
                   <div class="chart-container" style="position: relative; width:100%">
                     <canvas id="myChart3"></canvas>
                   </div>
-                  <h2>Kratie</h2>
                 </div>
                 <div class="col-lg-6">
+                  <h2>Siem Reap</h2>
                   <div class="chart-container" style="position: relative; width:100%">
                     <canvas id="myChart4"></canvas>
                   </div>
-                  <h2>Battambang</h2>
                 </div>
               </div>
-          </div>
-          <div style="text-align:center">
-            <button onclick="prediction()">Prediction</button>
           </div>
         </main>
       </div>
@@ -126,243 +123,11 @@
             console.error(error);
           });
       },
-    }, (err, results) => {
-      console.log('results', results);
-      var created_at = [];
-      _.each(results.getData, v => created_at.push(v.created_at));
-      var hight_stream = [];
-      _.each(results.getData, v => hight_stream.push(v.hight_stream));
-      console.log('created_at', created_at);
-      console.log('hight_stream', hight_stream);
-      var ctx1 = document.getElementById("myChart1");
-      var myChart1 = new Chart(ctx1, {
-        type: 'line',
-        data: {
-            labels: created_at,
-            datasets: [{
-                label: 'Stream Height',
-                data: hight_stream,
-                backgroundColor: 'transparent',
-                borderColor: [
-                    'rgba(255,99,132,1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero:true
-                    }
-                }]
-            }
-        }
-      });
-      var ctx2 = document.getElementById("myChart2");
-      var myChart2 = new Chart(ctx2, {
-        type: 'line',
-        data: {
-            labels: created_at,
-            datasets: [{
-                label: 'Stream Height',
-                data: hight_stream,
-                backgroundColor: 'transparent',
-                borderColor: [
-                    'rgba(255,99,132,1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero:true
-                    }
-                }]
-            }
-        }
-      });
-      var ctx3 = document.getElementById("myChart3");
-      var myChart2 = new Chart(ctx3, {
-        type: 'line',
-        data: {
-            labels: created_at,
-            datasets: [{
-                label: 'Stream Height',
-                data: hight_stream,
-                backgroundColor: 'transparent',
-                borderColor: [
-                    'rgba(255,99,132,1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero:true
-                    }
-                }]
-            }
-        }
-      });
-      var ctx4 = document.getElementById("myChart4");
-      var myChart2 = new Chart(ctx4, {
-        type: 'line',
-        data: {
-            labels: created_at,
-            datasets: [{
-                label: 'Stream Height',
-                data: hight_stream,
-                backgroundColor: 'transparent',
-                borderColor: [
-                    'rgba(255,99,132,1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero:true
-                    }
-                }]
-            }
-        }
-      });
-    });
-  var temp = [];
-    console.log('TTTTTT', temp);
-  var labels = [];
-  var data = []
-  for(var i=0; i < 60; i++) {
-    labels.push(("01/0" +i).toString());
-    data.push(i+10);
-  }
-  console.log('labels', labels, data);
-  // var ctx2 = document.getElementById("myChart2");
-  // var myChart2 = new Chart(ctx2, {
-  //   type: 'line',
-  //   data: {
-  //       labels: labels,
-  //       datasets: [{
-  //           label: 'Stream Height',
-  //           data: data,
-  //           backgroundColor: 'transparent',
-  //           borderColor: [
-  //               'rgba(255,99,132,1)',
-  //               'rgba(54, 162, 235, 1)',
-  //               'rgba(255, 206, 86, 1)',
-  //               'rgba(75, 192, 192, 1)',
-  //               'rgba(153, 102, 255, 1)',
-  //               'rgba(255, 159, 64, 1)'
-  //           ],
-  //           borderWidth: 1
-  //       }]
-  //   },
-  //   options: {
-  //       scales: {
-  //           yAxes: [{
-  //               ticks: {
-  //                   beginAtZero:true
-  //               }
-  //           }]
-  //       }
-  //   }
-  // });
-  // var ctx3 = document.getElementById("myChart3");
-  // var myChart2 = new Chart(ctx3, {
-  //   type: 'line',
-  //   data: {
-  //       labels: labels,
-  //       datasets: [{
-  //           label: 'Stream Height',
-  //           data: data,
-  //           backgroundColor: 'transparent',
-  //           borderColor: [
-  //               'rgba(255,99,132,1)',
-  //               'rgba(54, 162, 235, 1)',
-  //               'rgba(255, 206, 86, 1)',
-  //               'rgba(75, 192, 192, 1)',
-  //               'rgba(153, 102, 255, 1)',
-  //               'rgba(255, 159, 64, 1)'
-  //           ],
-  //           borderWidth: 1
-  //       }]
-  //   },
-  //   options: {
-  //       scales: {
-  //           yAxes: [{
-  //               ticks: {
-  //                   beginAtZero:true
-  //               }
-  //           }]
-  //       }
-  //   }
-  // });
-  // var ctx4 = document.getElementById("myChart4");
-  // var myChart2 = new Chart(ctx4, {
-  //   type: 'line',
-  //   data: {
-  //       labels: labels,
-  //       datasets: [{
-  //           label: 'Stream Height',
-  //           data: data,
-  //           backgroundColor: 'transparent',
-  //           borderColor: [
-  //               'rgba(255,99,132,1)',
-  //               'rgba(54, 162, 235, 1)',
-  //               'rgba(255, 206, 86, 1)',
-  //               'rgba(75, 192, 192, 1)',
-  //               'rgba(153, 102, 255, 1)',
-  //               'rgba(255, 159, 64, 1)'
-  //           ],
-  //           borderWidth: 1
-  //       }]
-  //   },
-  //   options: {
-  //       scales: {
-  //           yAxes: [{
-  //               ticks: {
-  //                   beginAtZero:true
-  //               }
-  //           }]
-  //       }
-  //   }
-  // });
-  function prediction() {
-    console.log('PREDICTION');
-    async.auto({
-      getData(callback) {
+      getPrediction(callback) {
         fetch('http://127.0.0.1:5000/forecast', {
-            method: 'POST',
-            body: {},
-          })
-          .then(response => {
+          method: 'POST',
+        })
+        .then(response => {
             if (response.status === 200) {
               return response.json();
             } else {
@@ -370,17 +135,243 @@
             }
           })
           .then(response => {
-            console.log('RESPONSE', response);
+            console.log('RESPONSE 1', response);
             console.debug(response);
-            callback(null, response.data);
+            callback(null, response);
             // ...
           }).catch(error => {
             console.error(error);
           });
-      },
+      }
     }, (err, results) => {
-      console.log('RESULTS', results);
+      
+      console.log('results', results);
+      // For BBT
+
+      // Hight Stream Current
+      var hight_stream_bbt_current = [];
+      var created_at_bbt= [];
+      _.each(results.getPrediction.bbt.concate_data, (v) => {
+        if(v.is_new === 0){
+          hight_stream_bbt_current.push(v.high);
+        } else if(v.is_new === 1) {
+          hight_stream_bbt_current.push(undefined);
+        }
+        created_at_bbt.push(moment(v.day).format('YYYY MM DD'));
+      });
+      // High Stream Predict
+      var hight_stream_bbt_pre = [];
+      _.each(results.getPrediction.bbt.concate_data, (v) => {
+        if(v.is_new === 0){
+          hight_stream_bbt_pre.push(undefined);
+        } else if (v.is_new === 1){
+          hight_stream_bbt_pre.push(v.high);
+        }
+      });
+
+      // For KC
+      // Hight Stream Current
+      var hight_stream_kc_current = [];
+      var created_at_kc = [];
+      _.each(results.getPrediction.kc.concate_data, (v) => {
+        if(v.is_new === 0){
+          hight_stream_kc_current.push(v.high);
+        } else if(v.is_new === 1) {
+          hight_stream_kc_current.push(undefined);
+        }
+        created_at_kc.push(moment(v.day).format('YYYY MM DD'));
+      });
+      // High Stream Predict
+      var hight_stream_kc_pre = [];
+      _.each(results.getPrediction.kc.concate_data, (v) => {
+        if(v.is_new === 0){
+          hight_stream_kc_pre.push(undefined);
+        } else if (v.is_new === 1){
+          hight_stream_kc_pre.push(v.high);
+        }
+      });
+      // FOR PS
+      // Hight Stream Current
+      var hight_stream_ps_current = [];
+      var created_at_ps = [];
+      _.each(results.getPrediction.ps.concate_data, (v) => {
+        if(v.is_new === 0){
+          hight_stream_ps_current.push(v.high);
+        } else if(v.is_new === 1) {
+          hight_stream_ps_current.push(undefined);
+        }
+        created_at_ps.push(moment(v.day).format('YYYY MM DD'));
+      });
+      // High Stream Predict
+      var hight_stream_ps_pre = [];
+      _.each(results.getPrediction.ps.concate_data, (v) => {
+        if(v.is_new === 0){
+          hight_stream_ps_pre.push(undefined);
+        } else if (v.is_new === 1){
+          hight_stream_ps_pre.push(v.high);
+        }
+      });
+      // FOR SR
+      // Hight Stream Current
+      var hight_stream_sr_current = [];
+      var created_at_sr = [];
+      _.each(results.getPrediction.sr.concate_data, (v) => {
+        if(v.is_new === 0){
+          hight_stream_sr_current.push(v.high);
+        } else if(v.is_new === 1) {
+          hight_stream_sr_current.push(undefined);
+        }
+        created_at_sr.push(moment(v.day).format('YYYY MM DD'));
+      });
+      // High Stream Predict
+      var hight_stream_sr_pre = [];
+      _.each(results.getPrediction.sr.concate_data, (v) => {
+        if(v.is_new === 0){
+          hight_stream_sr_pre.push(undefined);
+        } else if (v.is_new === 1){
+          hight_stream_sr_pre.push(v.high);
+        }
+      });
+      // RENDER BBT
+      var ctx1 = document.getElementById("myChart1");
+      var myChart1 = new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels: created_at_bbt,
+            datasets: [{
+                label: 'Current Value',
+                data: hight_stream_bbt_current,
+                backgroundColor: 'transparent',
+                borderColor: [
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 1
+            },
+            {
+                label: 'Predict Value',
+                data: hight_stream_bbt_pre,
+                backgroundColor: 'transparent',
+                borderColor: [
+                  'rgba(54, 162, 235, 1)',
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+      });
+      // RENDER KC
+      var ctx2 = document.getElementById("myChart2");
+      var myChart2 = new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: created_at_kc,
+            datasets: [{
+                label: 'Current Value',
+                data: hight_stream_kc_current,
+                backgroundColor: 'transparent',
+                borderColor: [
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 1
+            },
+            {
+                label: 'Predict Value',
+                data: hight_stream_kc_pre,
+                backgroundColor: 'transparent',
+                borderColor: [
+                  'rgba(54, 162, 235, 1)',
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+      });
+      // RENDER PS
+      var ctx3 = document.getElementById("myChart3");
+      var myChart3 = new Chart(ctx3, {
+        type: 'line',
+        data: {
+            labels: created_at_ps,
+            datasets: [{
+                label: 'Current Value',
+                data: hight_stream_ps_current,
+                backgroundColor: 'transparent',
+                borderColor: [
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 1
+            },
+            {
+                label: 'Predict Value',
+                data: hight_stream_ps_pre,
+                backgroundColor: 'transparent',
+                borderColor: [
+                  'rgba(54, 162, 235, 1)',
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+      });
+      // RENDER SR
+      var ctx4 = document.getElementById("myChart4");
+      var myChart4 = new Chart(ctx4, {
+        type: 'line',
+        data: {
+            labels: created_at_sr,
+            datasets: [{
+                label: 'Current Value',
+                data: hight_stream_sr_current,
+                backgroundColor: 'transparent',
+                borderColor: [
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 1
+            },
+            {
+                label: 'Predict Value',
+                data: hight_stream_sr_pre,
+                backgroundColor: 'transparent',
+                borderColor: [
+                  'rgba(54, 162, 235, 1)',
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+      });
     });
-  }
   </script>
 </html>

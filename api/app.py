@@ -38,11 +38,7 @@ def get_forcast(province):
     'response_code' : 200,
     'province' : province
   }
-  js = json.dumps(responseData)
-
-  resp = Response(js, status=200, mimetype='application/json')
-
-  return resp
+  return jsonify(responseData)
 
 
 @app.route('/forecast', methods=['POST'])
