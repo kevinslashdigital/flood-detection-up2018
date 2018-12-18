@@ -87,14 +87,23 @@ def funcPrediction( data,name ):
     print('last day of 30',last_day)
     start_date = last_day + timedelta(1)
     days = pd.date_range(start_date, start_date + timedelta(29), freq='D')
-    new_predictions = pd.DataFrame({'dae': days, 'high': predictions.flatten(), 'is_new': 1})
-    new_last_30_days = pd.DataFrame({'dae': last_30_days_date, 'high': last_30_days.flatten(), 'is_new': 0})
+    new_predictions = pd.DataFrame({'day': days, 'high': predictions.flatten(), 'is_new': 1}).to_dict(orient='index')
+    new_last_30_days = pd.DataFrame({'day': last_30_days_date, 'high': last_30_days.flatten(), 'is_new': 0}).to_dict(orient='index')
+    list_new_predictions = []
+    for key, value in new_predictions.items():
+      temp = value
+      list_new_predictions.append(temp)
+    list_new_last_30_days = []
+    for key, value in new_last_30_days.items():
+      temp1 = value
+      list_new_last_30_days.append(temp1)
     # merge last and predictions together
-    concate_data = np.append(new_last_30_days , new_predictions)
+    concate_date = np.append(list_new_last_30_days, list_new_predictions)
+    concate_data = {**new_last_30_days, **new_predictions}
     response = {
         "last_30_days" : last_30_days.tolist(),
         "prediction" : predictions.tolist(),
-        "concate_data" : concate_data.tolist()
+        "concate_data" : concate_date.tolist(),
       }
     return response
  
