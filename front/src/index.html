@@ -22,6 +22,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/async/2.6.1/async.min.js" type="text/javascript"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.js" type="text/javascript"></script>
   <script src="https://rawgit.com/moment/moment/2.2.1/min/moment.min.js" type="text/javascript"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
     <script>
       function copyLink() {
@@ -64,32 +65,37 @@
         </header>
         <main role="main" style="width:100%;height:100%;" class="chart-body-container">
           <div class="container">
-            <div class="row">
-                <div class="col-lg-6">
-                    <h2>Battambang</h2>
-                  <div class="chart-container" style="position: relative; width:100%">
-                    <canvas id="myChart1"></canvas>
+            <div id="loading-content" class="loader-container">
+              <div class="loader"></div>
+            </div>
+            <div id="chart-content" class="is-hidden-chart">
+                <div class="row">
+                  <div class="col-lg-6">
+                      <h2>Battambang</h2>
+                    <div class="chart-container" style="position: relative; width:100%">
+                      <canvas id="myChart1"></canvas>
+                    </div>
+                  </div>
+                  <div class="col-lg-6">
+                    <h2>Kampong Cham</h2>
+                    <div class="chart-container" style="position: relative; width:100%">
+                      <canvas id="myChart2"></canvas>
+                    </div>
+                  </div>
+                  <div class="col-lg-6">
+                    <h2>Pursat</h2>
+                    <div class="chart-container" style="position: relative; width:100%">
+                      <canvas id="myChart3"></canvas>
+                    </div>
+                  </div>
+                  <div class="col-lg-6">
+                    <h2>Siem Reap</h2>
+                    <div class="chart-container" style="position: relative; width:100%">
+                      <canvas id="myChart4"></canvas>
+                    </div>
                   </div>
                 </div>
-                <div class="col-lg-6">
-                  <h2>Kampong Cham</h2>
-                  <div class="chart-container" style="position: relative; width:100%">
-                    <canvas id="myChart2"></canvas>
-                  </div>
-                </div>
-                <div class="col-lg-6">
-                  <h2>Pursat</h2>
-                  <div class="chart-container" style="position: relative; width:100%">
-                    <canvas id="myChart3"></canvas>
-                  </div>
-                </div>
-                <div class="col-lg-6">
-                  <h2>Siem Reap</h2>
-                  <div class="chart-container" style="position: relative; width:100%">
-                    <canvas id="myChart4"></canvas>
-                  </div>
-                </div>
-              </div>
+            </div>
           </div>
         </main>
       </div>
@@ -121,6 +127,8 @@
             // ...
           }).catch(error => {
             console.error(error);
+            $("#chart-content").removeClass('is-hidden-chart');
+            $("#loading-content").addClass('is-hidden-chart');
           });
       },
       getPrediction(callback) {
@@ -141,10 +149,13 @@
             // ...
           }).catch(error => {
             console.error(error);
+            $("#chart-content").removeClass('is-hidden-chart');
+            $("#loading-content").addClass('is-hidden-chart');
           });
       }
     }, (err, results) => {
-      
+      $("#chart-content").removeClass('is-hidden-chart');
+      $("#loading-content").addClass('is-hidden-chart');
       console.log('results', results);
       // For BBT
 
