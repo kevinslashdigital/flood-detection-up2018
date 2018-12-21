@@ -17,7 +17,7 @@ import math
 
 verbose, epochs, batch_size = 1, 10, 16
 time_step = 30
-is_normalized = False
+is_normalized = True
 
 def save_scaler(scaler,name='test'):
     target_dir = './output/' + name
