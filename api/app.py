@@ -53,6 +53,7 @@ def classify():
     result_bbt = funcPrediction(df_bbt,'bt')
     result_kc = funcPrediction(df_kc,'kc')
     result_ps = funcPrediction(df_ps,'ps')
+
   response = {
       "sr": result_sr,
       "bbt": result_bbt,
@@ -66,6 +67,7 @@ def funcPrediction( data,name ):
     
     # get last 30 days
     last_30_days = data.tail(30)
+    # print('last '+ name + ' data : ', last_30_days)
     last_30_days = last_30_days.reset_index()
     # get last 30 days only streamHeight
     last_30_days = last_30_days['streamHeight'].values
@@ -80,7 +82,6 @@ def funcPrediction( data,name ):
     
     # generate date to data
     last_day = data.tail(1).reset_index()['created_at'][0]
-    print('last day of 30',last_day)
     start_date = last_day + timedelta(1)
     days = pd.date_range(start_date, start_date + timedelta(29), freq='D')
     new_predictions = pd.DataFrame({'day': days, 'high': predictions.flatten(), 'is_new': 1}).to_dict(orient='index')

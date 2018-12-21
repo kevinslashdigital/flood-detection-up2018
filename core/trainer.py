@@ -15,9 +15,9 @@ from keras.layers import LSTM
 import os
 import math
 
-verbose, epochs, batch_size = 1, 30, 16
+verbose, epochs, batch_size = 1, 10, 16
 time_step = 30
-is_normalized = True
+is_normalized = False
 
 def save_scaler(scaler,name='test'):
     target_dir = './output/' + name
@@ -28,6 +28,9 @@ def load_scaler(name='test'):
     target_dir = './output/' + name
     scaler = joblib.load(target_dir+"_scaler.save")
     return scaler 
+
+def plot(data,name):
+  data.plot(x='created_at',y='streamHeight',title=name).figure.savefig('output/'+name+'.png')
 
 # split a univariate dataset into train/test sets
 def split_dataset(data,name='test'):
@@ -254,10 +257,14 @@ if __name__ == "__main__":
     kc = df_kc.loc[:, 'streamHeight']
     ps = df_ps.loc[:, 'streamHeight']
 
-    print(sr.tail(30))
+    # print(sr.tail(30))
+    # plot(sr,'siem_reab')
+    # plot(bbt,'bat_dom_bong')
+    # plot(kc,'kompong_cham')
+    plot(ps,'posat')
 
     fit_and_save_model(sr,'sr')
-    # fit_and_save_model(bbt,'bt')
-    # fit_and_save_model(kc,'kc')
-    # fit_and_save_model(ps,'ps')
+    fit_and_save_model(bbt,'bt')
+    fit_and_save_model(kc,'kc')
+    fit_and_save_model(ps,'ps')
     
