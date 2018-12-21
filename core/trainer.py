@@ -15,9 +15,9 @@ from keras.layers import LSTM
 import os
 import math
 
-verbose, epochs, batch_size = 1, 5, 16
+verbose, epochs, batch_size = 1, 30, 16
 time_step = 30
-is_normalized = False
+is_normalized = True
 
 def save_scaler(scaler,name='test'):
     target_dir = './output/' + name
@@ -230,7 +230,7 @@ def fit_and_save_model(dataset,name):
     print('predictions',predictions)
     # predictions = array(predictions)
     score, scores = evaluate_forecasts(test_y, predictions)
-    print('score',score,scores)
+    print('test score',score,scores)
     # forecast to next 30 step
     last_step = test[-1,:]
     pred = forecast(model,last_step,n_input)
@@ -238,7 +238,7 @@ def fit_and_save_model(dataset,name):
     if is_normalized:
         scaler = load_scaler(name)
         pred = scaler.inverse_transform([pred])
-    print('last step {} forecast to {}'.format(last_step,pred))
+    print('{} last step {} forecast to {}'.format(name,last_step,pred))
     # save model
     save_model(model,name)
     # plot next 30 step forecast
@@ -257,7 +257,7 @@ if __name__ == "__main__":
     print(sr.tail(30))
 
     fit_and_save_model(sr,'sr')
-    fit_and_save_model(bbt,'bt')
-    fit_and_save_model(kc,'kc')
-    fit_and_save_model(ps,'ps')
+    # fit_and_save_model(bbt,'bt')
+    # fit_and_save_model(kc,'kc')
+    # fit_and_save_model(ps,'ps')
     
