@@ -6,4 +6,4 @@ fq_all_selected_word.log
 **/node_modules
 yarn.lock
 tf-log
-output
+# output
